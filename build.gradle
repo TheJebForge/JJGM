@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+mainClassName = 'com.thejebforge.jjgm.runtime.Application'
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.thejebforge.jjgm.runtime.Application'
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+group 'org.thejebforge.jjgm'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'org.lwjgl', name: 'lwjgl', version: '3.2.+'
+    implementation group: 'org.joml', name: 'joml', version:'1.9.+'
+    implementation group: 'org.lwjgl', name: 'lwjgl', version:'3.2.+'
+    implementation group: 'org.lwjgl', name: 'lwjgl-assimp', version:'3.2.+'
+    implementation group: 'org.lwjgl', name: 'lwjgl-glfw', version:'3.2.+'
+    implementation group: 'org.lwjgl', name: 'lwjgl-opengl', version:'3.2.+'
+    implementation group: 'org.lwjgl', name: 'lwjgl-stb', version:'3.2.+'
+    implementation group: 'org.lwjgl', name: 'lwjgl', version:'3.2.+', classifier:'natives-windows'
+    implementation group: 'org.lwjgl', name: 'lwjgl-assimp', version:'3.2.+', classifier:'natives-windows'
+    implementation group: 'org.lwjgl', name: 'lwjgl-opengl', version:'3.2.+', classifier:'natives-windows'
+    implementation group: 'org.lwjgl', name: 'lwjgl-glfw', version:'3.2.+', classifier:'natives-windows'
+    implementation group: 'org.lwjgl', name: 'lwjgl-stb', version:'3.2.+', classifier:'natives-windows'
+    implementation group: 'cz.advel.jbullet', name: 'jbullet', version: '20101010-1'
+}
