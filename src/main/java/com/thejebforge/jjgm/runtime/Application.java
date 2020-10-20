@@ -1,6 +1,7 @@
 package com.thejebforge.jjgm.runtime;
 
 import com.thejebforge.jjgm.rendering.containers.Models;
+import com.thejebforge.jjgm.rendering.containers.RenderBuffers;
 import com.thejebforge.jjgm.rendering.containers.Shaders;
 import com.thejebforge.jjgm.rendering.*;
 import com.thejebforge.jjgm.rendering.elements.Camera;
@@ -49,6 +50,7 @@ public class Application {
             Core.pollEvents();
         }
 
+        RenderBuffers.destroyAll();
         Models.destroyAll();
         Shaders.destroyAll();
         main.destroy();

@@ -34,10 +34,10 @@ public class RenderBuffer {
         }, new int[]{
                 0, 2, 1, 1, 2, 3
         }, new Vector3f[]{
-                new Vector3f(0, 0, 1f),
-                new Vector3f(0, 0, 1f),
-                new Vector3f(0, 0, 1f),
-                new Vector3f(0, 0, 1f),
+                new Vector3f(0, 0, -1f),
+                new Vector3f(0, 0, -1f),
+                new Vector3f(0, 0, -1f),
+                new Vector3f(0, 0, -1f),
         }, new Vector2f[]{
                 new Vector2f(0, 1f),
                 new Vector2f(1f, 1f),
@@ -59,16 +59,10 @@ public class RenderBuffer {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-        depthTextureID = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, depthTextureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, window.width, window.height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
-
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTextureID, 0);
+        depthTextureID = glGenRenderbuffers();
+        glBindRenderbuffer(GL_RENDERBUFFER, depthTextureID);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, window.width, window.height);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthTextureID);
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureID, 0);
 
@@ -82,26 +76,29 @@ public class RenderBuffer {
 
     public void enableBuffer(){
         glBindFramebuffer(GL_FRAMEBUFFER, frameBufferID);
-        glViewport(0,0,window.width,window.height);
+        //glViewport(0,0,window.width,window.height);
     }
 
     public void disableBuffer(){
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        //glViewport(0,0,window.width,window.height);
     }
 
     public void drawBuffer(){
-        //shader.enableShader();
+        shader.enableShader();
 
 //        glBindFramebuffer(GL_READ_FRAMEBUFFER, frameBufferID);
 //
 //        glBlitFramebuffer(0, 0, window.width, window.height, 0, 0, window.width, window.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+        glClear(GL_DEPTH_BUFFER_BIT);
 
         glBindVertexArray(quad.getVaoID());
 
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
 
-        glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE5);
         glBindTexture(GL_TEXTURE_2D, textureID);
 
         glDrawElements(GL_TRIANGLES, quad.getVertexCount(), GL_UNSIGNED_INT, 0);
@@ -114,7 +111,7 @@ public class RenderBuffer {
 
     public void destroy(){
         glDeleteTextures(textureID);
-        glDeleteTextures(depthTextureID);
+        glDeleteRenderbuffers(depthTextureID);
         glDeleteFramebuffers(frameBufferID);
     }
 

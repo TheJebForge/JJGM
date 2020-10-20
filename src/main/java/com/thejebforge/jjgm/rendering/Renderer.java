@@ -6,11 +6,14 @@ import com.thejebforge.jjgm.rendering.elements.Window;
 import com.thejebforge.jjgm.rendering.shaders.Shader;
 import com.thejebforge.jjgm.rendering.utils.RenderBuffer;
 import com.thejebforge.jjgm.util.TimeUtil;
+import org.lwjgl.opengl.GLDebugMessageCallback;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.KHRDebug.*;
+import static org.lwjgl.system.MemoryUtil.*;
 
 public class Renderer {
     private Window window;
@@ -22,6 +25,8 @@ public class Renderer {
     private RenderBuffer test;
     private RenderBuffer transparent;
     private Shader red;
+
+    private boolean callBackCreated = false;
 
     public Renderer(Window window){
         this.window = window;
@@ -46,6 +51,61 @@ public class Renderer {
 
     public void draw(){
         window.makeActive();
+
+        System.out.println("FRAME START ------------------------------------------");
+
+
+        glEnable(GL_DEBUG_OUTPUT);
+
+        if(!callBackCreated) {
+            glDebugMessageCallback(new GLDebugMessageCallback() {
+                @Override
+                public void invoke(int source, int type, int id, int severity, int length, long message, long userParam) {
+                    String sourceStr = "UNKNOWN";
+
+                    switch (source) {
+                        case GL_DEBUG_SOURCE_API:
+                            sourceStr = "API";
+                        case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+                            sourceStr = "WINDOW SYSTEM";
+                        case GL_DEBUG_SOURCE_SHADER_COMPILER:
+                            sourceStr = "SHADER COMPILER";
+                        case GL_DEBUG_SOURCE_THIRD_PARTY:
+                            sourceStr = "THIRD PARTY";
+                        case GL_DEBUG_SOURCE_APPLICATION:
+                            sourceStr = "APPLICATION";
+                        case GL_DEBUG_SOURCE_OTHER:
+                            sourceStr = "OTHER";
+                    }
+
+                    String typeStr = "UNKNOWN";
+
+                    switch (type)
+                    {
+                        case GL_DEBUG_TYPE_ERROR: typeStr = "ERROR";
+                        case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: typeStr = "DEPRECATED_BEHAVIOR";
+                        case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: typeStr = "UNDEFINED_BEHAVIOR";
+                        case GL_DEBUG_TYPE_PORTABILITY: typeStr = "PORTABILITY";
+                        case GL_DEBUG_TYPE_PERFORMANCE: typeStr = "PERFORMANCE";
+                        case GL_DEBUG_TYPE_MARKER: typeStr = "MARKER";
+                        case GL_DEBUG_TYPE_OTHER: typeStr = "OTHER";
+                    }
+
+                    String severityStr = "UNKNOWN";
+
+                    switch (severity) {
+                        case GL_DEBUG_SEVERITY_NOTIFICATION: severityStr = "NOTIFICATION";
+                        case GL_DEBUG_SEVERITY_LOW: severityStr = "LOW";
+                        case GL_DEBUG_SEVERITY_MEDIUM: severityStr = "MEDIUM";
+                        case GL_DEBUG_SEVERITY_HIGH: severityStr = "HIGH";
+                    }
+
+                    System.out.println("["+sourceStr+"] "+typeStr+" "+severityStr+" id:"+id+" : "+ memUTF8(memByteBuffer(message, length)));
+                }
+            }, 0);
+
+            callBackCreated = true;
+        }
 
         glEnable(GL_DEPTH_TEST);
 
@@ -90,6 +150,9 @@ public class Renderer {
         //transparent.disableBuffer();
 
         test.drawBuffer();
+
+
+        System.out.println("FRAME END ------------------------------------------");
 
         window.swap();
     }

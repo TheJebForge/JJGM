@@ -5,7 +5,6 @@ in vec2 textureCoords;
 in vec3 normal;
 
 uniform float time;
-
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 transform;
